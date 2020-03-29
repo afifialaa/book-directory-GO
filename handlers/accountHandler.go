@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/afifialaa/auth"
+	"github.com/afifialaa/validation"
 
 	"net/http"
 	"fmt"
@@ -47,26 +48,25 @@ func SignupHandle(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "*")
 
-	user := user_type{
+	user := validation.User_type{
 		r.FormValue("firstName"),
 		r.FormValue("lastName"),
 		r.FormValue("email"),
 		r.FormValue("password"),
 	}
 
-	// okay := validation.ValidateUser(user)
-	okay := true
+		okay := validation.ValidateUser(&user)
 	if okay {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 
-		//generate token
-		token := auth.GenerateToken(user.email)
+		// Generate token
+		token := auth.GenerateToken(user.Email)
 
-		//creating json
+		// Generate json
 		data := map[string] string{"msg": "saved user", "token":token}
 
-		//sending response
+		// Sending response
 		json.NewEncoder(w).Encode(data)
 	}else{
 		w.Header().Set("Content-Type", "application/json")
