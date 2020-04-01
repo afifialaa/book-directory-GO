@@ -34,11 +34,11 @@ func GetToken(r *http.Request)string{
 	splitToken := strings.Split(reqToken, "Bearer ")
 	reqToken = splitToken[1]
 
-	if reqToken != " " {
+	if reqToken != "" {
 		return reqToken
 	} 
 
-	return "no token"
+	return ""
 }
 
 //validate token

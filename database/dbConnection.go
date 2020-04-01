@@ -1,23 +1,28 @@
 package dbConnection
 
 import (
-	"go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	
-	"fmt"
-	"context"
-	"log"
+	  "go.mongodb.org/mongo-driver/bson"
+	  "go.mongodb.org/mongo-driver/mongo"
+	  "go.mongodb.org/mongo-driver/mongo/options"
+
+	  "github.com/afifialaa/validation"
+
+	  "fmt"
+	  "context"
+	  "log"
 )
 
 type UserType struct{
-	firstName string
-	lastName string
-	email string
-	password string
+	  firstName string
+	  lastName string
+	  email string
+	  password string
 }
 
-func Connect(){
+var userCollection *mongo.Collection
+
+func Connect() {
+	fmt.Println("#Connect")
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
 	// Connect to MongoDB
@@ -36,17 +41,33 @@ func Connect(){
 
 	fmt.Println("Connected to MongoDB!")
 
-	// collection
-	collection := client.Database("private").Collection("users")
-	fmt.Println(collection)
+	// Set database and collection
+	userCollection = client.Database("private").Collection("users")
+	fmt.Println(userCollection)
+}
 
-	// Mock 
-	filter := bson.D{{"email", "afifi@gmail.com"}}
-
-	var result UserType
-	err = collection.FindOne(context.TODO(), filter).Decode(&result)
-	if err != nil{
-		log.Fatal(err)
+// Insert new  user
+func SaveUser(user *validation.User_type) bool {
+	insertResult, err := userCollection.InsertOne(context.TODO(), user)
+	if err != nil {
+		fmt.Println("mongodb error " ,err.Error())
+		return false
 	}
-	fmt.Printf("Found a single document: %+v\n", result)
+
+	fmt.Println("#saveuser -> user was created: ", insertResult.InsertedID)
+	return true;
+}
+
+func FindUser(user *validation.User_login_type)bool{
+	var result validation.User_type
+
+	filter := bson.D{{"email", user.Email}}
+	err := userCollection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		fmt.Println("user was not found")
+		return false
+	}
+
+	return true
 }

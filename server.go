@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/afifialaa/handlers"
+	database "github.com/afifialaa/database"
 	"fmt"
 	"net/http"
 
@@ -12,6 +13,7 @@ type Status struct{
 }
 
 func main(){
+	database.Connect()
 
 	//routes
 	http.HandleFunc("/user/signup", handlers.SignupHandle)

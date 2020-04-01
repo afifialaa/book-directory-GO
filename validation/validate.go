@@ -13,6 +13,11 @@ type User_type struct{
 	Password string
 }
 
+type User_login_type struct{
+	Email string
+	Password string
+}
+
 func ValidateUser(user *User_type) bool{
 
 	//empty fields
