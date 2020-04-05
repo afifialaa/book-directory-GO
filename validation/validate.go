@@ -45,7 +45,11 @@ func ValidateUser(user *User_type) bool{
 	return true
 }
 
-//validating email
+func ValidateUserLogin(user *User_login_type) bool {
+	return true
+}
+
+// Validating email
 func validateEmail(email string) bool{
 	re := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	return re.MatchString(email)

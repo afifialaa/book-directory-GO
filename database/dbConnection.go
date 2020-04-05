@@ -46,7 +46,7 @@ func Connect() {
 	fmt.Println(userCollection)
 }
 
-// Insert new  user
+// Insert new user
 func SaveUser(user *validation.User_type) bool {
 	insertResult, err := userCollection.InsertOne(context.TODO(), user)
 	if err != nil {

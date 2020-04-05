@@ -15,12 +15,12 @@ type Status struct{
 func main(){
 	database.Connect()
 
-	//routes
+	// routes
 	http.HandleFunc("/user/signup", handlers.SignupHandle)
 	http.HandleFunc("/user/signin", handlers.LoginHandle)
-	http.HandleFunc("/user/test", handlers.LoginHandle)
+	http.HandleFunc("/api/service/test", handlers.TestHandle)
 
-	//listening for requests
+	// listening for requests
 	fmt.Println("server is running")
 	http.ListenAndServe(":8080", nil)
 

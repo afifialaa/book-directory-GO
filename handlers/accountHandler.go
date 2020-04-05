@@ -1,20 +1,21 @@
 package handlers
 
 import (
-	"github.com/afifialaa/auth"
-	"github.com/afifialaa/validation"
-	database "github.com/afifialaa/database"
+	  "github.com/afifialaa/auth"
+	  "github.com/afifialaa/validation"
+	  database "github.com/afifialaa/database"
+	  session "github.com/afifialaa/sessions"
 
-	"net/http"
-	"fmt"
-	"encoding/json"
+	  "net/http"
+	  "fmt"
+	  "encoding/json"
 )
 
 type user_type struct{
-	firstName string
-	lastName string
-	email string
-	password string
+	  firstName string
+	  lastName string
+	  email string
+	  password string
 }
 
 // Login handle
@@ -27,31 +28,30 @@ func LoginHandle(w http.ResponseWriter, r *http.Request){
 		r.FormValue("password"),
 	}
 
-	// Aquiring token from request header
-	reqToken := auth.GetToken(r)
+	validUser := validation.ValidateUserLogin(&user)
 
-	// No token provided
-	if reqToken == "" {
-
-		fmt.Println("token not found")
+	if !validUser{
 
 		// Send failed response 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-
-		// Generate json
-		data := map[string] string{"msg": "token missing"}
-
-		// Sending response
+		data := map[string] string{"msg": "not a valid user input"}
 		json.NewEncoder(w).Encode(data)
+
 	}else{
 		userFound := database.FindUser(&user)
 		if userFound {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 
+			// Start session.
+			session.Start(user.Email)
+
+			// Create token
+			token := auth.GenerateToken(user.Email)
+
 			// Generate json
-			data := map[string] string{"msg": "user found"}
+			data := map[string] string{"msg": "user found", "token": token}
 
 			// Sending response
 			json.NewEncoder(w).Encode(data)
@@ -69,6 +69,11 @@ func LoginHandle(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+func SignoutHandle(w http.ResponseWriter, r *http.Request){
+	  session.End()
+	  fmt.Println("session was ended")
+}
+
 func SignupHandle(w http.ResponseWriter, r *http.Request){
 	fmt.Println("#Signup_handle")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -81,8 +86,8 @@ func SignupHandle(w http.ResponseWriter, r *http.Request){
 		r.FormValue("password"),
 	}
 
-	okay := validation.ValidateUser(&user)
-	if okay {
+	valid := validation.ValidateUser(&user)
+	if valid {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 
@@ -109,4 +114,37 @@ func SignupHandle(w http.ResponseWriter, r *http.Request){
 		data := map[string] string{"msg" : "user was not created"}
 		json.NewEncoder(w).Encode(data)
 	}
+}
+
+func TestHandle(w http.ResponseWriter, r *http.Request){
+	  // get token from request
+	  	// if exists -> validate
+		// else -> send response indicating failure
+	  // validate token
+	  	// if valid -> send response indicating success
+		// else -> send reponse indicating failure
+
+	var token string = auth.GetToken(r)
+	// No token found
+	if token == ""{
+		  w.Header().Set("Content-Type", "application/json")
+		  data := map[string] string{"msg" : "token was not found"}
+		  json.NewEncoder(w).Encode(data) 
+	}
+
+	// Validate token
+	validToken := auth.ValidateToken(token)
+
+	// Not a valid token
+	if !validToken{
+		w.Header().Set("Content-Type", "application/json")
+		data := map[string] string{"msg" : "invalid token"}
+		json.NewEncoder(w).Encode(data)
+    }else{
+		// Serve the user
+		w.Header().Set("Content-Type", "application/json")
+		data := map[string] string{"msg" : "token was valid and user was served"}
+		json.NewEncoder(w).Encode(data)
+    }
+
 }
