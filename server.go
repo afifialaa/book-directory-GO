@@ -1,27 +1,33 @@
 package main
 
 import (
-	"github.com/afifialaa/handlers"
-	database "github.com/afifialaa/database"
 	"fmt"
 	"net/http"
 
+	database "github.com/afifialaa/REST-GO/database"
+	"github.com/afifialaa/REST-GO/handlers"
+
+	gorillaHandler "github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
-type Status struct{
+type Status struct {
 	msg string
 }
 
-func main(){
+func main() {
 	database.Connect()
+	r := mux.NewRouter()
 
-	// routes
-	http.HandleFunc("/user/signup", handlers.SignupHandle)
-	http.HandleFunc("/user/signin", handlers.LoginHandle)
-	http.HandleFunc("/api/service/test", handlers.TestHandle)
+	// Routes
+	r.HandleFunc("/", handlers.HomeHandler).Methods("GET")
 
-	// listening for requests
+	r.HandleFunc("/search/searchByAuthor", handlers.SearchByAuthor).Methods("GET")
+	r.HandleFunc("/search/searchByTitle", handlers.SearchByTitle).Methods("GET")
+	r.HandleFunc("/search/searchByID", handlers.SearchByID).Methods("GET")
+	r.HandleFunc("/search/test", handlers.TestHandler).Methods("GET")
+
+	// Listening for requests
 	fmt.Println("server is running")
-	http.ListenAndServe(":8080", nil)
-
+	http.ListenAndServe(":8080", gorillaHandler.CORS()(r))
 }

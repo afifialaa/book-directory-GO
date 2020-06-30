@@ -1,28 +1,20 @@
 package dbConnection
 
 import (
-	  "go.mongodb.org/mongo-driver/bson"
-	  "go.mongodb.org/mongo-driver/mongo"
-	  "go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
-	  "github.com/afifialaa/validation"
+	"github.com/afifialaa/REST-GO/models"
 
-	  "fmt"
-	  "context"
-	  "log"
+	"context"
+	"fmt"
+	"log"
 )
 
-type UserType struct{
-	  firstName string
-	  lastName string
-	  email string
-	  password string
-}
-
-var userCollection *mongo.Collection
+var booksCollection *mongo.Collection
 
 func Connect() {
-	fmt.Println("#Connect")
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
 	// Connect to MongoDB
@@ -42,32 +34,82 @@ func Connect() {
 	fmt.Println("Connected to MongoDB!")
 
 	// Set database and collection
-	userCollection = client.Database("private").Collection("users")
-	fmt.Println(userCollection)
+	booksCollection = client.Database("library").Collection("books")
+	return
 }
 
-// Insert new user
-func SaveUser(user *validation.User_type) bool {
-	insertResult, err := userCollection.InsertOne(context.TODO(), user)
-	if err != nil {
-		fmt.Println("mongodb error " ,err.Error())
-		return false
-	}
-
-	fmt.Println("#saveuser -> user was created: ", insertResult.InsertedID)
-	return true;
+type BookType struct {
+	BookID             string
+	Title              string
+	Authors            string
+	Average_rating     string
+	Isbn               string
+	Isb13              string
+	Language_code      string
+	Ratings_count      string
+	Text_reviews_count string
+	Publication_dates  string
+	Publisher          string
 }
 
-func FindUser(user *validation.User_login_type)bool{
-	var result validation.User_type
+func SearchByAuthor(author string)[]models.BookType{
+	filter := bson.D{{"authors", author}}
 
-	filter := bson.D{{"email", user.Email}}
-	err := userCollection.FindOne(context.TODO(), filter).Decode(&result)
+	// Finding multiple documents returns a cursor
+	cursor, err := booksCollection.Find(context.TODO(), filter)
 
 	if err != nil {
-		fmt.Println("user was not found")
-		return false
+		fmt.Println(err)
 	}
 
-	return true
+	var result []models.BookType
+
+	// Iterate over the cursor and decode each document
+	for cursor.Next(context.TODO()) {
+		var book models.BookType
+
+		err := cursor.Decode(&book)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		result = append(result, book)
+	}
+
+	cursor.Close(context.TODO())
+	return result
+}
+
+
+func SearchByID(bookId string) models.BookType {
+	filter := bson.D{{"bookID", bookId}}
+
+	var result models.BookType
+	err := booksCollection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		switch err {
+		case mongo.ErrNoDocuments:
+			fmt.Println("There are no document")
+		}
+	}
+	fmt.Println(result.BookID)
+	return result
+}
+
+func SearchByTitle(bookTitle string) BookType {
+	filter := bson.D{{"title", bookTitle}}
+
+	var result BookType
+	err := booksCollection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		switch err {
+		case mongo.ErrNoDocuments:
+			fmt.Println("There are no document")
+		}
+	}
+	fmt.Println("result is " , result)
+	return result
 }
