@@ -6,10 +6,10 @@ type BookType struct {
 	Authors            string
 	Average_rating     string
 	Isbn               string
-	Isb13              string
+	Isbn13             string
 	Language_code      string
 	Ratings_count      string
 	Text_reviews_count string
-	Publication_dates  string
+	Publication_date   string
 	Publisher          string
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	database "github.com/afifialaa/REST-GO/database"
@@ -10,10 +11,6 @@ import (
 	gorillaHandler "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
-
-type Status struct {
-	msg string
-}
 
 func main() {
 	database.Connect()
@@ -27,7 +24,15 @@ func main() {
 	r.HandleFunc("/search/searchByID", handlers.SearchByID).Methods("GET")
 	r.HandleFunc("/search/test", handlers.TestHandler).Methods("GET")
 
+	r.HandleFunc("/delete/deleteByID", handlers.DeleteByID).Methods("DELETE")
+
+	r.HandleFunc("/update/updateBook", handlers.UpdateBook).Methods("PUT")
+
 	// Listening for requests
 	fmt.Println("server is running")
-	http.ListenAndServe(":8080", gorillaHandler.CORS()(r))
+	err := http.ListenAndServe(":8080", gorillaHandler.CORS()(r))
+	if err != nil {
+		log.Fatal("server crashed")
+		log.Fatal(err)
+	}
 }

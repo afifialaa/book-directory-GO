@@ -10,6 +10,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+
+	"github.com/fatih/structs"
 )
 
 var booksCollection *mongo.Collection
@@ -38,21 +40,36 @@ func Connect() {
 	return
 }
 
-type BookType struct {
-	BookID             string
-	Title              string
-	Authors            string
-	Average_rating     string
-	Isbn               string
-	Isb13              string
-	Language_code      string
-	Ratings_count      string
-	Text_reviews_count string
-	Publication_dates  string
-	Publisher          string
+func UpdateBook(book models.BookType) bool {
+	data := structs.Map(book)
+
+	_, err := booksCollection.UpdateOne(context.TODO(), bson.M{"bookID": book.BookID},
+		bson.D{
+			{"$set", data},
+		},
+	)
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	return true
 }
 
-func SearchByAuthor(author string)[]models.BookType{
+func DeleteByID(bookId string) bool {
+	filter := bson.D{{"bookID", bookId}}
+
+	_, err := booksCollection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("failed to delete book")
+		return false
+	}
+
+	return true
+}
+
+func SearchByAuthor(author string) []models.BookType {
 	filter := bson.D{{"authors", author}}
 
 	// Finding multiple documents returns a cursor
@@ -81,7 +98,6 @@ func SearchByAuthor(author string)[]models.BookType{
 	return result
 }
 
-
 func SearchByID(bookId string) models.BookType {
 	filter := bson.D{{"bookID", bookId}}
 
@@ -98,10 +114,10 @@ func SearchByID(bookId string) models.BookType {
 	return result
 }
 
-func SearchByTitle(bookTitle string) BookType {
+func SearchByTitle(bookTitle string) models.BookType {
 	filter := bson.D{{"title", bookTitle}}
 
-	var result BookType
+	var result models.BookType
 	err := booksCollection.FindOne(context.TODO(), filter).Decode(&result)
 
 	if err != nil {
@@ -110,6 +126,6 @@ func SearchByTitle(bookTitle string) BookType {
 			fmt.Println("There are no document")
 		}
 	}
-	fmt.Println("result is " , result)
+	fmt.Println("result is ", result)
 	return result
 }
