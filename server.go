@@ -22,11 +22,10 @@ func main() {
 	r.HandleFunc("/search/searchByAuthor", handlers.SearchByAuthor).Methods("GET")
 	r.HandleFunc("/search/searchByTitle", handlers.SearchByTitle).Methods("GET")
 	r.HandleFunc("/search/searchByID", handlers.SearchByID).Methods("GET")
-	r.HandleFunc("/search/test", handlers.TestHandler).Methods("GET")
 
-	r.HandleFunc("/delete/deleteByID", handlers.DeleteByID).Methods("DELETE")
+	r.HandleFunc("/delete", handlers.DeleteByID).Methods("DELETE")
 
-	r.HandleFunc("/update/updateBook", handlers.UpdateBook).Methods("PUT")
+	r.HandleFunc("/update", handlers.UpdateBook).Methods("PUT")
 
 	// Listening for requests
 	fmt.Println("server is running")

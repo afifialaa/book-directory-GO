@@ -1,6 +1,8 @@
 package dbConnection
 
 import (
+	"os"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +19,7 @@ import (
 var booksCollection *mongo.Collection
 
 func Connect() {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_LOCAL"))
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -36,7 +38,7 @@ func Connect() {
 	fmt.Println("Connected to MongoDB!")
 
 	// Set database and collection
-	booksCollection = client.Database("library").Collection("books")
+	booksCollection = client.Database(os.Getenv("DATABASE")).Collection("books")
 	return
 }
 
