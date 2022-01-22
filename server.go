@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	database "github.com/afifialaa/REST-GO/database"
-	"github.com/afifialaa/REST-GO/handlers"
+	database "github.com/afifialaa/book-directory-GO/database"
+	"github.com/afifialaa/book-directory-GO/handlers"
 
 	gorillaHandler "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"

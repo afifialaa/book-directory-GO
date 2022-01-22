@@ -8,6 +8,25 @@ import (
 	"github.com/afifialaa/REST-GO/models"
 )
 
+func DeleteByID(w http.ResponseWriter, req *http.Request) {
+	bookId := req.FormValue("id")
+	ans := database.DeleteByID(bookId)
+
+	if !ans {
+		data := map[string]string{"msg": "failed to delete"}
+		json.NewEncoder(w).Encode(data)
+	} else {
+		data := map[string]string{"msg": "book was deleted"}
+		json.NewEncoder(w).Encode(data)
+	}
+}
+
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	res := map[string]string{"msg": "Hello from home page"}
+	json.NewEncoder(w).Encode(res)
+}
+
 func UpdateBook(w http.ResponseWriter, req *http.Request) {
 
 	var book = models.BookType{
