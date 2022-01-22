@@ -14,18 +14,19 @@ import (
 
 func main() {
 	database.Connect()
-	r := mux.NewRouter()
+	router := mux.NewRouter()
+
+	api := router.PathPrefix("/api").Subrouter()
+	apiv1 := api.PathPrefix("/v1").Subrouter()
 
 	// Routes
-	r.HandleFunc("/", handlers.HomeHandler).Methods("GET")
+	apiv1.HandleFunc("/", handlers.HomeHandler).Methods("GET")
+	apiv1.HandleFunc("/book/{author}", handlers.SearchByAuthor).Methods("GET")
+	apiv1.HandleFunc("/book/{title}", handlers.SearchByTitle).Methods("GET")
 
-	r.HandleFunc("/search/searchByAuthor", handlers.SearchByAuthor).Methods("GET")
-	r.HandleFunc("/search/searchByTitle", handlers.SearchByTitle).Methods("GET")
-	r.HandleFunc("/search/searchByID", handlers.SearchByID).Methods("GET")
-
-	r.HandleFunc("/delete", handlers.DeleteByID).Methods("DELETE")
-
-	r.HandleFunc("/update", handlers.UpdateBook).Methods("PUT")
+	apiv1.HandleFunc("/book/{bookId}", handlers.DeleteByID).Methods("DELETE")
+	apiv1.HandleFunc("/book/{bookId}", handlers.SearchByID).Methods("GET")
+	apiv1.HandleFunc("/book/{bookId}", handlers.UpdateBook).Methods("PUT")
 
 	// Listening for requests
 	fmt.Println("server is running")
