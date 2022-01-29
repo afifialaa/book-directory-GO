@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	database "github.com/afifialaa/REST-GO/database"
-	"github.com/afifialaa/REST-GO/models"
+	database "book-directory-GO/database"
+	"book-directory-GO/models"
+
+	"github.com/fatih/structs"
 )
 
 func DeleteByID(w http.ResponseWriter, req *http.Request) {
@@ -50,4 +52,24 @@ func UpdateBook(w http.ResponseWriter, req *http.Request) {
 	}
 	json.NewEncoder(w).Encode(map[string]string{"msg": "book was updated"})
 
+}
+
+func SearchByTitle(w http.ResponseWriter, req *http.Request) {
+	title := req.FormValue("title")
+	result := database.SearchByTitle(title)
+	res := structs.Map(result)
+	json.NewEncoder(w).Encode(res)
+}
+
+func SearchByAuthor(w http.ResponseWriter, req *http.Request) {
+	author := req.FormValue("author")
+	result := database.SearchByAuthor(author)
+
+	json.NewEncoder(w).Encode(result)
+}
+
+func SearchByID(w http.ResponseWriter, req *http.Request) {
+	id := req.FormValue("id")
+	result := database.SearchByID(id)
+	json.NewEncoder(w).Encode(result)
 }

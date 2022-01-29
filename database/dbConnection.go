@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/afifialaa/REST-GO/models"
+	"book-directory-GO/models"
 
 	"context"
 	"fmt"

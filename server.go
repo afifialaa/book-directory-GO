@@ -5,14 +5,18 @@ import (
 	"log"
 	"net/http"
 
-	database "github.com/afifialaa/book-directory-GO/database"
-	"github.com/afifialaa/book-directory-GO/handlers"
+	database "book-directory-GO/database"
+	"book-directory-GO/handlers"
+
+	config "book-directory-GO/config"
 
 	gorillaHandler "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	config.Startup()
+
 	database.Connect()
 	router := mux.NewRouter()
 
@@ -30,7 +34,7 @@ func main() {
 
 	// Listening for requests
 	fmt.Println("server is running")
-	err := http.ListenAndServe(":8080", gorillaHandler.CORS()(r))
+	err := http.ListenAndServe(":8080", gorillaHandler.CORS()(apiv1))
 	if err != nil {
 		log.Fatal("server crashed")
 		log.Fatal(err)
