@@ -8,6 +8,7 @@ import (
 	"book-directory-GO/models"
 
 	"github.com/fatih/structs"
+	"github.com/gorilla/mux"
 )
 
 func DeleteByID(w http.ResponseWriter, req *http.Request) {
@@ -69,7 +70,8 @@ func SearchByAuthor(w http.ResponseWriter, req *http.Request) {
 }
 
 func SearchByID(w http.ResponseWriter, req *http.Request) {
-	id := req.FormValue("id")
+	params := mux.Vars(req)
+	id := params["bookId"]
 	result := database.SearchByID(id)
 	json.NewEncoder(w).Encode(result)
 }

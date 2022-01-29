@@ -1,8 +1,6 @@
 package dbConnection
 
 import (
-	"os"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,7 +17,7 @@ import (
 var booksCollection *mongo.Collection
 
 func Connect() {
-	clientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_LOCAL"))
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -38,8 +36,7 @@ func Connect() {
 	fmt.Println("Connected to MongoDB!")
 
 	// Set database and collection
-	booksCollection = client.Database(os.Getenv("DATABASE")).Collection("books")
-	return
+	booksCollection = client.Database("books_dir").Collection("books")
 }
 
 func UpdateBook(book models.BookType) bool {
@@ -109,10 +106,9 @@ func SearchByID(bookId string) models.BookType {
 	if err != nil {
 		switch err {
 		case mongo.ErrNoDocuments:
-			fmt.Println("There are no document")
+			fmt.Println("There are no documents")
 		}
 	}
-	fmt.Println(result.BookID)
 	return result
 }
 

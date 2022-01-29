@@ -8,15 +8,11 @@ import (
 	database "book-directory-GO/database"
 	"book-directory-GO/handlers"
 
-	config "book-directory-GO/config"
-
 	gorillaHandler "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	config.Startup()
-
 	database.Connect()
 	router := mux.NewRouter()
 
@@ -25,8 +21,6 @@ func main() {
 
 	// Routes
 	apiv1.HandleFunc("/", handlers.HomeHandler).Methods("GET")
-	apiv1.HandleFunc("/book/{author}", handlers.SearchByAuthor).Methods("GET")
-	apiv1.HandleFunc("/book/{title}", handlers.SearchByTitle).Methods("GET")
 
 	apiv1.HandleFunc("/book/{bookId}", handlers.DeleteByID).Methods("DELETE")
 	apiv1.HandleFunc("/book/{bookId}", handlers.SearchByID).Methods("GET")
